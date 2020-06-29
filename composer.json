@@ -5,11 +5,18 @@
         "nyholm/psr7-server": "^1.0"
     },
     "require-dev": {
-        "codeception/codeception": "^4.1"
+        "phpunit/phpunit": "9.2",
+        "guzzlehttp/guzzle": "7.0",
+        "fzaninotto/faker": "^1.9"
     },
     "autoload": {
         "psr-4": {
             "Collectors\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Collectors\\Tests\\": "tests/"
         }
     }
 }
