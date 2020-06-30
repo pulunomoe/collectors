@@ -15,12 +15,13 @@ class APITestCase extends TestCase
 	public static function setUpBeforeClass(): void
 	{
 		self::$client = new Client([
-			'base_uri' => 'http://localhost:3000/api',
+			'base_uri' => 'http://localhost:3000/api/',
 			'http_errors' => false
 		]);
 
 		self::$faker = Factory::create();
 
 		self::$db = new \SQLite3('collectors_test.db');
+		self::$db->exec('DELETE FROM collections');
 	}
 }

@@ -13,7 +13,7 @@ class CollectionTest extends APITestCase
 
 	public function testIndex()
 	{
-		$response = self::$client->get('/collections');
+		$response = self::$client->get('collections');
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$body = json_decode($response->getBody());
@@ -21,14 +21,27 @@ class CollectionTest extends APITestCase
 
 		$collections = [];
 		for ($i = 0; $i < 5; $i++) {
-			$collection[$i] = $this->insert();
+			$collections[$i] = $this->insert();
 		}
 
-		$response = self::$client->get('/collections');
+		$response = self::$client->get('collections');
 		$this->assertEquals(200, $response->getStatusCode());
 
 		$body = json_decode($response->getBody(), true);
-		$this->assertEqualsCanonicalizing($body, $collections);
+		for ($i = 0; $i < 5; $i++) {
+			$this->assertEqualsCanonicalizing($collections[$i], $body[$i]);
+		}
+	}
+
+	public function testGet()
+	{
+		$collection = $this->insert();
+
+		$response = self::$client->get('collections/'.$collection['id']);
+		$this->assertEquals(200, $response->getStatusCode());
+
+		$body = json_decode($response->getBody(), true);
+		$this->assertEqualsCanonicalizing($collection, $body);
 	}
 
 	public function testCreate()
@@ -38,7 +51,7 @@ class CollectionTest extends APITestCase
 			'description' => self::$faker->sentence
 		];
 
-		$response = self::$client->post('/collections', [
+		$response = self::$client->post('collections', [
 			'json' => $collection
 		]);
 		$this->assertEquals(200, $response->getStatusCode());
@@ -47,7 +60,7 @@ class CollectionTest extends APITestCase
 		$collection['id'] = $body->id;
 		$this->assertNotEmpty($collection['id']);
 
-		$data = self::$db->querySingle('SELECT * FROM item WHERE id = ' + $id, true);
+		$data = self::$db->querySingle('SELECT * FROM collections WHERE id = '.$collection['id'], true);
 		$this->assertEqualsCanonicalizing($collection, $data);
 	}
 
@@ -57,12 +70,12 @@ class CollectionTest extends APITestCase
 		$collection['name'] = self::$faker->word;
 		$collection['description'] = self::$faker->sentence;
 
-		$response = self::$client->put('/collections', [
+		$response = self::$client->put('collections', [
 			'json' => $collection
 		]);
 		$this->assertEquals(200, $response->getStatusCode());
 
-		$data = self::$db->querySingle('SELECT * FROM item WHERE id = ' + $collection['id'], true);
+		$data = self::$db->querySingle('SELECT * FROM collections WHERE id = '.$collection['id'], true);
 		$this->assertEqualsCanonicalizing($collection, $data);
 	}
 
@@ -70,12 +83,12 @@ class CollectionTest extends APITestCase
 	{
 		$collection = $this->insert();
 
-		$response = self::$client->delete('/collections', [
+		$response = self::$client->delete('collections', [
 			'json' => ['id' => $collection['id']]
 		]);
 		$this->assertEquals(200, $response->getStatusCode());
 
-		$data = self::$db->querySingle('SELECT * FROM item WHERE id = ' + $collection['id']);
+		$data = self::$db->querySingle('SELECT * FROM collections WHERE id = '.$collection['id']);
 		$this->assertEmpty($data);
 	}
 

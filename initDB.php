@@ -1,10 +1,10 @@
 <?php
 
-$dbFile = empty($argv[1]) ? 'collectors.db' : 'collectors_test.db';
+$dbFile = getenv('COLLECTORS_ENV') == 'DEV' ? 'collectors_test.db' : 'collectors.db';
 
 $db = new SQLite3($dbFile);
 
-$sql = 'CREATE TABLE collections (';
+$sql = 'CREATE TABLE IF NOT EXISTS collections (';
 $sql .= '	id INTEGER PRIMARY KEY,';
 $sql .= '	name TEXT NOT NULL,';
 $sql .= '	description TEXT';
