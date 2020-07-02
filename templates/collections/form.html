@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="mb-3">{{ id ? 'edit' : 'add new' }} collection</h1>
+
+<div class="btn-group mb-3">
+	{% if id %}
+	<a href="/collections/view/{{ id }}" class="btn btn-outline-primary">back to view</a>
+	{% endif %}
+	<a href="/collections" class="btn btn-outline-primary">back to list</a>
+</div>
+
+<form id="collectionForm">
+	{% if id %}
+	<input type="hidden" id="id" value="{{ id }}" />
+	{% endif %}
+	<div class="form-group">
+		<label for="name">name</label>
+		<input type="text" class="form-control" id="name" />
+	</div>
+	<div class="form-group">
+		<label for="description">description</label>
+		<textarea class="form-control" id="description"></textarea>
+	</div>
+	<button class="btn btn-primary" id="save">Save</button>
+</form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ id }}');
+
+		let collection = await response.json();
+
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		document.querySelector('input#name').value = collection.name;
+		document.querySelector('textarea#description').innerHTML = collection.description
+
+	})();
+
+	document.querySelector('button#save').onclick = async function (e) {
+
+		e.preventDefault();
+
+		{% if id %}
+
+		let response = await fetch('/api/collections', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify({
+				'id': document.querySelector('input#id').value,
+				'name': document.querySelector('input#name').value,
+				'description': document.querySelector('textarea#description').value
+			})
+		});
+
+		window.location.replace('/collections/view/{{ id }}');
+
+		{% else %}
+
+		let response = await fetch('/api/collections', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify({
+				'name': document.querySelector('input#name').value,
+				'description': document.querySelector('textarea#description').value,
+			})
+		});
+
+		let collection = await response.json();
+		window.location.replace('/collections/view/' + collection.id);
+
+		{% endif %}
+
+	}
+
+</script>
+{% endblock %}

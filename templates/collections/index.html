@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="mb-3">collections</h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections/form" class="btn btn-primary">add new collection</a>
+</div>
+
+<table class="table table-sm" id="collectionsTable">
+	<thead>
+		<tr>
+			<th>name</th>
+			<th>description</th>
+			<th>action</th>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+		let response = await fetch('/api/collections');
+		let collections = await response.json();
+		for (collection of collections) {
+			let row = '<tr>';
+			row += '<td>';
+			row += '<a href="/collections/view/'+collection.id+'">';
+			row += collection.name;
+			row += '</a>';
+			row += '</td>';
+			row += '<td>';
+			row += collection.description;
+			row += '</td>';
+			row += '<td>';
+			row += '<div class="btn-group">';
+			row += '<a href="/collections/form/'+collection.id+'" class="btn btn-sm btn-info">Edit</a>';
+			row += '<a href="/collections/delete/'+collection.id+'" class="btn btn-sm btn-danger">Delete</a>';
+			row += '</div>';
+			row += '</td>';
+			row += '</tr>';
+			document.querySelector('#collectionsTable > tbody').innerHTML += row;
+		}
+	})();
+
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="mb-3 collectionName"></h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections" class="btn btn-outline-primary">back to list</a>
+	<a href="/collections/form/{{ id }}" class="btn btn-info">edit</a>
+	<a href="/collections/delete/{{ id }}" class="btn btn-danger">delete</a>
+</div>
+
+<dl class="row">
+	<dt class="col-sm-2">name</dt>
+	<dd class="col-sm-10 collectionName"></dd>
+	<dt class="col-sm-2">description</dt>
+	<dd class="col-sm-10 collectionDescription"></dd>
+</dl>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ id }}');
+
+		let collection = await response.json();
+
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+		document.querySelectorAll('.collectionDescription').forEach((el) => el.innerHTML = collection.description);
+
+	})();
+
+</script>
+{% endblock %}
