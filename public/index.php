@@ -20,6 +20,13 @@ $app->post('/api/collections', 'Collectors\API\Collection:create');
 $app->put('/api/collections', 'Collectors\API\Collection:update');
 $app->delete('/api/collections', 'Collectors\API\Collection:delete');
 
+$app->get('/api/fields', 'Collectors\API\Field:index');
+$app->get('/api/fields/{id}', 'Collectors\API\Field:get');
+$app->post('/api/fields', 'Collectors\API\Field:create');
+$app->put('/api/fields', 'Collectors\API\Field:update');
+$app->put('/api/fields/order', 'Collectors\API\Field:updateOrder');
+$app->delete('/api/fields', 'Collectors\API\Field:delete');
+
 ////////////////////////////////////////////////////////////////////////////////
 
 $app->get('/{route}[/{method}[/{id}]]', function ($request, $response, $args) {

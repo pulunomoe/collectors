@@ -2,14 +2,14 @@
 
 namespace Collectors\Tests\API;
 
-use Collectors\Tests\APITestCase;
-
 class CollectionTest extends APITestCase
 {
 	public function tearDown(): void
 	{
 		self::$db->exec('DELETE FROM collections');
 	}
+
+	////////////////////////////////////////////////////////////////////////////
 
 	public function testIndex()
 	{
@@ -21,7 +21,7 @@ class CollectionTest extends APITestCase
 
 		$collections = [];
 		for ($i = 0; $i < 5; $i++) {
-			$collections[$i] = $this->insert();
+			$collections[$i] = self::createCollection();
 		}
 
 		$response = self::$client->get('collections');
@@ -35,7 +35,7 @@ class CollectionTest extends APITestCase
 
 	public function testGet()
 	{
-		$collection = $this->insert();
+		$collection = self::createCollection();
 
 		$response = self::$client->get('collections/'.$collection['id']);
 		$this->assertEquals(200, $response->getStatusCode());
@@ -66,7 +66,7 @@ class CollectionTest extends APITestCase
 
 	public function testUpdate()
 	{
-		$collection = $this->insert();
+		$collection = self::createCollection();
 		$collection['name'] = self::$faker->word;
 		$collection['description'] = self::$faker->sentence;
 
@@ -81,7 +81,7 @@ class CollectionTest extends APITestCase
 
 	public function testDelete()
 	{
-		$collection = $this->insert();
+		$collection = self::createCollection();
 
 		$response = self::$client->delete('collections', [
 			'json' => ['id' => $collection['id']]
@@ -90,23 +90,5 @@ class CollectionTest extends APITestCase
 
 		$data = self::$db->querySingle('SELECT * FROM collections WHERE id = '.$collection['id']);
 		$this->assertEmpty($data);
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-
-	private function insert()
-	{
-		$collection = [
-			'name' => self::$faker->word,
-			'description' => self::$faker->sentence
-		];
-
-		self::$db->exec('INSERT INTO collections (name, description) VALUES ('
-			.'"'.$collection['name'].'", '
-			.'"'.$collection['description'].'"'
-		.')');
-		$collection['id'] = self::$db->lastInsertRowID();
-
-		return $collection;
 	}
 }
