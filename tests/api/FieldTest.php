@@ -62,7 +62,7 @@ class FieldTest extends APITestCase
 		$field = [
 			'collection_id' => self::$collection['id'],
 			'name' => self::$faker->word,
-			'order' => self::$faker->randomDigit,
+			'order' => 0,
 			'hidden' => self::$faker->randomElement([0, 1]),
 			'shown' => self::$faker->randomElement([0, 1]),
 			'description' => self::$faker->sentence

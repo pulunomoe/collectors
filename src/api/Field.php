@@ -40,7 +40,7 @@ class Field extends APIController
 		$this->query('INSERT INTO fields (collection_id, name, `order`, hidden, shown, description) VALUES (:collection_id, :name, :order, :hidden, :shown, :description)', [
 			'collection_id' => $field['collection_id'],
 			'name' => $field['name'],
-			'order' => $field['order'],
+			'order' => 0,
 			'hidden' => $field['hidden'],
 			'shown' => $field['shown'],
 			'description' => $field['description']

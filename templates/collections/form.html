@@ -1,5 +1,22 @@
 {% extends "base.html" %}
 
+{% block breadcrumb %}
+
+{% if id %}
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ id }}" class="collectionName"></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="/collections/form/{{ id }}">edit</a>
+</li>
+{% else %}
+<li class="breadcrumb-item">
+	<a href="/collections/form">add</a>
+</li>
+{% endif %}
+
+{% endblock %}
+
 {% block content %}
 
 <h1 class="mb-3">{{ id ? 'edit' : 'add new' }} collection</h1>
@@ -31,18 +48,15 @@
 {% block script %}
 <script>
 
+	{% if id %}
 	(async () => {
-
 		let response = await fetch('/api/collections/{{ id }}');
-
 		let collection = await response.json();
-
 		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
-
 		document.querySelector('input#name').value = collection.name;
-		document.querySelector('textarea#description').innerHTML = collection.description
-
+		document.querySelector('textarea#description').innerHTML = collection.description;
 	})();
+	{% endif %}
 
 	document.querySelector('button#save').onclick = async function (e) {
 

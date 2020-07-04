@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ id }}" class="collectionName"></a>
+</li>
+
+{% endblock %}
+
 {% block content %}
 
 <h1 class="mb-3 collectionName"></h1>
@@ -17,6 +25,25 @@
 	<dd class="col-sm-10 collectionDescription"></dd>
 </dl>
 
+<div class="btn-group mb-3">
+	<a href="/fields/reorder?collection_id={{ id }}" class="btn btn-info">reorder</a>
+	<a href="/fields/form?collection_id={{ id }}" class="btn btn-primary">add new field</a>
+</div>
+
+<table class="table table-sm" id="fieldsTable">
+	<thead>
+		<tr>
+			<th>order</th>
+			<th>name</th>
+			<th>hidden</th>
+			<th>shown</th>
+			<th>description</th>
+			<th>action</th>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+
 {% endblock %}
 
 {% block script %}
@@ -25,11 +52,28 @@
 	(async () => {
 
 		let response = await fetch('/api/collections/{{ id }}');
-
 		let collection = await response.json();
-
 		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
 		document.querySelectorAll('.collectionDescription').forEach((el) => el.innerHTML = collection.description);
+
+		response = await fetch('/api/fields?collection_id={{ id }}');
+		let fields = await response.json();
+		for (field of fields) {
+			let row = '<tr>';
+			row += '<td>' + field.order + '</td>';
+			row += '<td>' + field.name + '</td>';
+			row += '<td>' + (field.hidden ? 'yes' : 'no') + '</td>';
+			row += '<td>' + (field.shown ? 'yes' : 'no') + '</td>';
+			row += '<td>' + field.description + '</td>';
+			row += '<td>';
+			row += '<div class="btn-group">';
+			row += '<a href="/fields/form/'+field.id+'?collection_id={{ id }}" class="btn btn-sm btn-info">Edit</a>';
+			row += '<a href="/fields/delete/'+field.id+'?collection_id={{ id }}" class="btn btn-sm btn-danger">Delete</a>';
+			row += '</div>';
+			row += '</td>';
+			row += '</tr>';
+			document.querySelector('#fieldsTable > tbody').innerHTML += row;
+		}
 
 	})();
 

@@ -29,14 +29,8 @@
 		let collections = await response.json();
 		for (collection of collections) {
 			let row = '<tr>';
-			row += '<td>';
-			row += '<a href="/collections/view/'+collection.id+'">';
-			row += collection.name;
-			row += '</a>';
-			row += '</td>';
-			row += '<td>';
-			row += collection.description;
-			row += '</td>';
+			row += '<td><a href="/collections/view/'+collection.id+'">' + collection.name + '</a></td>';
+			row += '<td>' + collection.description + '</td>';
 			row += '<td>';
 			row += '<div class="btn-group">';
 			row += '<a href="/collections/form/'+collection.id+'" class="btn btn-sm btn-info">Edit</a>';
