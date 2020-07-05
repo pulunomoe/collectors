@@ -37,9 +37,11 @@ class Field extends APIController
 	{
 		$field = $request->getParsedBody();
 
-		$this->query('INSERT INTO fields (collection_id, name, `order`, hidden, shown, description) VALUES (:collection_id, :name, :order, :hidden, :shown, :description)', [
+		$this->query('INSERT INTO fields (collection_id, name, prefix, suffix, `order`, hidden, shown, description) VALUES (:collection_id, :name, :prefix, :suffix, :order, :hidden, :shown, :description)', [
 			'collection_id' => $field['collection_id'],
 			'name' => $field['name'],
+			'prefix' => $field['prefix'],
+			'suffix' => $field['suffix'],
 			'order' => 0,
 			'hidden' => $field['hidden'],
 			'shown' => $field['shown'],
@@ -74,9 +76,11 @@ class Field extends APIController
 	{
 		$field = $request->getParsedBody();
 
-		$this->query('UPDATE fields SET name = :name, hidden = :hidden, shown = :shown, description = :description WHERE id = :id', [
+		$this->query('UPDATE fields SET name = :name, prefix = :prefix, suffix = :suffix, hidden = :hidden, shown = :shown, description = :description WHERE id = :id', [
 			'id' => $field['id'],
 			'name' => $field['name'],
+			'prefix' => $field['prefix'],
+			'suffix' => $field['suffix'],
 			'hidden' => $field['hidden'],
 			'shown' => $field['shown'],
 			'description' => $field['description']

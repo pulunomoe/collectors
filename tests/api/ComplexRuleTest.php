@@ -29,6 +29,8 @@ class ComplexRuleTest extends APITestCase
 		$field = [
 			'collection_id' => self::$collection['id'],
 			'name' => self::$faker->word,
+			'prefix' => self::$faker->word,
+			'suffix' => self::$faker->word,
 			'order' => 6,
 			'hidden' => self::$faker->randomElement([0, 1]),
 			'shown' => self::$faker->randomElement([0, 1]),

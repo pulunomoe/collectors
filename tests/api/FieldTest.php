@@ -56,6 +56,8 @@ class FieldTest extends APITestCase
 		$field = [
 			'collection_id' => self::$collection['id'],
 			'name' => self::$faker->word,
+			'prefix' => self::$faker->word,
+			'suffix' => self::$faker->word,
 			'order' => 0,
 			'hidden' => self::$faker->randomElement([0, 1]),
 			'shown' => self::$faker->randomElement([0, 1]),
@@ -79,6 +81,8 @@ class FieldTest extends APITestCase
 	{
 		$field = self::createField(self::$collection['id']);
 		$field['name'] = self::$faker->word;
+		$field['prefix'] = self::$faker->word;
+		$field['suffix'] = self::$faker->word;
 		$field['hidden'] = self::$faker->randomElement([0, 1]);
 		$field['shown'] = self::$faker->randomElement([0, 1]);
 		$field['description'] = self::$faker->sentence;

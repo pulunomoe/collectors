@@ -34,10 +34,22 @@
 	{% endif %}
 	<input type="hidden" id="collection_id" value="{{ query.collection_id }}" />
 	<div class="row">
-		<div class="col-8">
+		<div class="col-4">
 			<div class="form-group">
 				<label for="name">name</label>
 				<input type="text" class="form-control" id="name" />
+			</div>
+		</div>
+		<div class="col-2">
+			<div class="form-group">
+				<label for="prefix">prefix</label>
+				<input type="text" class="form-control" id="prefix" />
+			</div>
+		</div>
+		<div class="col-2">
+			<div class="form-group">
+				<label for="prefix">suffix</label>
+				<input type="text" class="form-control" id="suffix" />
 			</div>
 		</div>
 		<div class="col-2">
@@ -79,6 +91,8 @@
 		let field = await response.json();
 		document.querySelectorAll('.fieldName').forEach((el) => el.innerHTML = field.name);
 		document.querySelector('input#name').value = field.name;
+		document.querySelector('input#prefix').value = field.prefix;
+		document.querySelector('input#suffix').value = field.suffix;
 		document.querySelector('textarea#description').innerHTML = field.description;
 		document.querySelector('select#hidden').value = field.hidden;
 		document.querySelector('select#shown').value = field.shown;
@@ -94,6 +108,8 @@
 		let field = {
 			'collection_id': document.querySelector('input#collection_id').value,
 			'name': document.querySelector('input#name').value,
+			'prefix': document.querySelector('input#prefix').value,
+			'suffix': document.querySelector('input#suffix').value,
 			'hidden': document.querySelector('select#hidden').value,
 			'shown': document.querySelector('select#shown').value,
 			'description': document.querySelector('textarea#description').value

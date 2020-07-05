@@ -40,6 +40,7 @@ class APITestCase extends TestCase
 	protected static function createCollection()
 	{
 		$collection = [
+			'id' => '',
 			'name' => self::$faker->word,
 			'description' => self::$faker->sentence
 		];
@@ -56,17 +57,22 @@ class APITestCase extends TestCase
 	protected static function createField($collectionId, $order = 0)
 	{
 		$field = [
+			'id' => '',
 			'collection_id' => $collectionId,
 			'name' => self::$faker->word,
+			'prefix' => self::$faker->word,
+			'suffix' => self::$faker->word,
 			'order' => $order,
 			'hidden' => self::$faker->randomElement([0, 1]),
 			'shown' => self::$faker->randomElement([0, 1]),
 			'description' => self::$faker->sentence
 		];
 
-		self::$db->exec('INSERT INTO fields (collection_id, name, `order`, hidden, shown, description) VALUES ('
+		self::$db->exec('INSERT INTO fields (collection_id, name, prefix, suffix, `order`, hidden, shown, description) VALUES ('
 			.'"'.$field['collection_id'].'", '
 			.'"'.$field['name'].'", '
+			.'"'.$field['prefix'].'", '
+			.'"'.$field['suffix'].'", '
 			.'"'.$field['order'].'", '
 			.'"'.$field['hidden'].'", '
 			.'"'.$field['shown'].'", '
@@ -80,6 +86,7 @@ class APITestCase extends TestCase
 	protected static function createItem($collectionId, $fields)
 	{
 		$item = [
+			'id' => '',
 			'collection_id' => $collectionId,
 			'name' => self::$faker->word,
 			'description' => self::$faker->sentence

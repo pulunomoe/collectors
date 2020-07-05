@@ -16,10 +16,12 @@ $stmt->execute();
 $collectionId = $db->lastInsertRowID();
 
 $fieldIds = [];
-$stmt = $db->prepare('INSERT INTO fields (collection_id, name, `order`, hidden, shown, description) VALUES (:collection_id, :name, :order, 0, 0, :description)');
+$stmt = $db->prepare('INSERT INTO fields (collection_id, name, prefix, suffix, `order`, hidden, shown, description) VALUES (:collection_id, :name, :prefix, :suffix, :order, 0, 0, :description)');
 for ($i = 0; $i < 5; $i++) {
 	$stmt->bindValue(':collection_id', $collectionId);
 	$stmt->bindValue(':name', $faker->word);
+	$stmt->bindValue(':prefix', $faker->word);
+	$stmt->bindValue(':suffix', $faker->word);
 	$stmt->bindValue(':order', $i + 1);
 	$stmt->bindValue(':description', $faker->sentence);
 	$stmt->execute();
