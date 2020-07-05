@@ -27,6 +27,12 @@ $app->put('/api/fields', 'Collectors\API\Field:update');
 $app->put('/api/fields/order', 'Collectors\API\Field:updateOrder');
 $app->delete('/api/fields', 'Collectors\API\Field:delete');
 
+$app->get('/api/items', 'Collectors\API\Item:index');
+$app->get('/api/items/{id}', 'Collectors\API\Item:get');
+$app->post('/api/items', 'Collectors\API\Item:create');
+$app->put('/api/items', 'Collectors\API\Item:update');
+$app->delete('/api/items', 'Collectors\API\Item:delete');
+
 ////////////////////////////////////////////////////////////////////////////////
 
 $app->get('/{route}[/{method}[/{id}]]', function ($request, $response, $args) {

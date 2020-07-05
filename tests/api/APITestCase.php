@@ -22,6 +22,16 @@ class APITestCase extends TestCase
 		self::$faker = Factory::create();
 
 		self::$db = new \SQLite3('collectors_test.db');
+		self::$db->exec('DELETE FROM items');
+		self::$db->exec('DELETE FROM fields');
+		self::$db->exec('DELETE FROM collections');
+
+	}
+
+	public static function tearDownAfterClass(): void
+	{
+		self::$db->exec('DELETE FROM items');
+		self::$db->exec('DELETE FROM fields');
 		self::$db->exec('DELETE FROM collections');
 	}
 
@@ -51,7 +61,7 @@ class APITestCase extends TestCase
 			'order' => $order,
 			'hidden' => self::$faker->randomElement([0, 1]),
 			'shown' => self::$faker->randomElement([0, 1]),
-			'description' => self::$faker->sentence,
+			'description' => self::$faker->sentence
 		];
 
 		self::$db->exec('INSERT INTO fields (collection_id, name, `order`, hidden, shown, description) VALUES ('
@@ -65,5 +75,30 @@ class APITestCase extends TestCase
 		$field['id'] = self::$db->lastInsertRowID();
 
 		return $field;
+	}
+
+	protected static function createItem($collectionId, $fields)
+	{
+		$item = [
+			'collection_id' => $collectionId,
+			'name' => self::$faker->word,
+			'description' => self::$faker->sentence
+		];
+
+		$itemData = [];
+		foreach ($fields as $field) {
+			$itemData[$field['name']] = self::$faker->word;
+		}
+		$item['data'] = json_encode($itemData);
+
+		$stmt = self::$db->prepare('INSERT INTO items (collection_id, name, description, data) VALUES (:collection_id, :name, :description, :data)');
+		$stmt->bindValue(':collection_id', $item['collection_id']);
+		$stmt->bindValue(':name', $item['name']);
+		$stmt->bindValue(':description', $item['description']);
+		$stmt->bindValue(':data', $item['data']);
+		$stmt->execute();
+		$item['id'] = self::$db->lastInsertRowID();
+
+		return $item;
 	}
 }

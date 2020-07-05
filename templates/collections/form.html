@@ -62,39 +62,29 @@
 
 		e.preventDefault();
 
+		let collection = {
+			'name': document.querySelector('input#name').value,
+			'description': document.querySelector('textarea#description').value
+		};
+
+		let method = 'POST';
+
 		{% if id %}
 
-		let response = await fetch('/api/collections', {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json;charset=utf-8'
-			},
-			body: JSON.stringify({
-				'id': document.querySelector('input#id').value,
-				'name': document.querySelector('input#name').value,
-				'description': document.querySelector('textarea#description').value
-			})
-		});
-
-		window.location.replace('/collections/view/{{ id }}');
-
-		{% else %}
-
-		let response = await fetch('/api/collections', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json;charset=utf-8'
-			},
-			body: JSON.stringify({
-				'name': document.querySelector('input#name').value,
-				'description': document.querySelector('textarea#description').value,
-			})
-		});
-
-		let collection = await response.json();
-		window.location.replace('/collections/view/' + collection.id);
+		collection.id = document.querySelector('input#id').value;
+		method = 'PUT';
 
 		{% endif %}
+
+		let response = await fetch('/api/collections', {
+			method: method,
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify(collection)
+		});
+
+		window.location.replace('/collections');
 
 	}
 

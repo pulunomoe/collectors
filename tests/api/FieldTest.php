@@ -8,13 +8,7 @@ class FieldTest extends APITestCase
 
 	public static function setUpBeforeClass(): void
 	{
-		self::$db->exec('DELETE FROM collections');
 		self::$collection = self::createCollection();
-	}
-
-	public static function tearDownAfterClass(): void
-	{
-		self::$db->exec('DELETE FROM collections');
 	}
 
 	public function tearDown(): void
@@ -34,7 +28,7 @@ class FieldTest extends APITestCase
 
 		$fields = [];
 		for ($i = 0; $i < 5; $i++) {
-			$fields[$i] = self::createField(self::$collection['id'], $i);
+			$fields[$i] = self::createField(self::$collection['id'], $i + 1);
 		}
 
 		$response = self::$client->get('fields?collection_id='.self::$collection['id']);
