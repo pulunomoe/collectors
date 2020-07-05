@@ -2,13 +2,18 @@
 
 namespace Collectors\API;
 
+use Intervention\Image\ImageManager;
 use Collectors\API\APIController;
 
 class Item extends APIController
 {
+	private $imageManager;
+
 	public function __construct()
 	{
 		parent::__construct();
+
+		$this->imageManager = new ImageManager();
 	}
 
 	public function index($request, $response)
@@ -45,6 +50,11 @@ class Item extends APIController
 		]);
 		$id = $this->db->lastInsertRowID();
 
+		if (!empty($item['image'])) {
+			$image = $this->imageManager->make($item['image']);
+			$image->save(__DIR__.'/../../public/upload/item_'.$id.'.jpg');
+		}
+
 		return $response->withJson(['id' => $id]);
 	}
 
@@ -58,6 +68,11 @@ class Item extends APIController
 			'description' => $item['description'],
 			'data' => $item['data']
 		]);
+
+		if (!empty($item['image'])) {
+			$image = $this->imageManager->make($item['image']);
+			$image->save(__DIR__.'/../../public/upload/item_'.$item['id'].'.jpg');
+		}
 
 		return $response->withStatus(200);
 	}

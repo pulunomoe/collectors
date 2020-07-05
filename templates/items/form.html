@@ -43,6 +43,12 @@
 		<label for="description">description</label>
 		<textarea class="form-control" id="description"></textarea>
 	</div>
+	<input type="hidden" id="image-data" value="{{ query.collection_id }}" />
+	<img id="preview" style="display: none" />
+	<div class="form-group">
+		<label for="image">image</label>
+		<input type="file" class="form-control-file" id="image" />
+	</div>
 	<button class="btn btn-primary" id="save">Save</button>
 </form>
 
@@ -75,18 +81,42 @@
 
 		response = await fetch('/api/items/{{ id }}');
 		let item = await response.json();
-		document.querySelectorAll('.itemName').forEach((el) => el.innerHTML = collection.name);
+		document.querySelectorAll('.itemName').forEach((el) => el.innerHTML = item.name);
 		document.querySelector('input#name').value = item.name;
 		document.querySelector('textarea#description').innerHTML = item.description;
 
 		let itemData = JSON.parse(item.data);
 		for (field of fields) {
-			document.querySelector('input#field-' + field.id).value = itemData[field.name];
+			document.querySelector('input#field-' + field.id).value = itemData[field.id];
+		}
+
+		response = await fetch('/upload/item_{{ id }}.jpg');
+		if (response.ok) {
+			let imgPreview = document.querySelector('img#preview');
+			imgPreview.setAttribute('src', '/upload/item_{{ id }}.jpg');
+			imgPreview.setAttribute('height', 300);
+			imgPreview.setAttribute('class', 'img-thumbnail w-25 mb-3');
+			imgPreview.removeAttribute('style');
 		}
 
 		{% endif %}
 
 	})();
+
+	document.querySelector('input#image').onchange = function () {
+		if (this.files && this.files[0]) {
+			let reader = new FileReader();
+			reader.onload = function (e) {
+				let imgPreview = document.querySelector('img#preview');
+				imgPreview.setAttribute('src', e.target.result);
+				imgPreview.setAttribute('height', 300);
+				imgPreview.setAttribute('class', 'img-thumbnail w-25 mb-3');
+				imgPreview.removeAttribute('style');
+				document.querySelector('input#image-data').value = e.target.result;
+			}
+			reader.readAsDataURL(this.files[0]);
+		}
+	}
 
 	document.querySelector('button#save').onclick = async function (e) {
 
@@ -95,7 +125,8 @@
 		let item = {
 			'collection_id': document.querySelector('input#collection_id').value,
 			'name': document.querySelector('input#name').value,
-			'description': document.querySelector('textarea#description').value
+			'description': document.querySelector('textarea#description').value,
+			'image': document.querySelector('input#image-data').value
 		};
 
 		let itemData = {};
