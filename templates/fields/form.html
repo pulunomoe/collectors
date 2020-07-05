@@ -71,7 +71,14 @@
 		<label for="description">description</label>
 		<textarea class="form-control" id="description"></textarea>
 	</div>
+	{% if not id %}
+	<div class="form-group">
+		<input type="checkbox" value="1" id="addAnother" checked="checked">
+		<label for="addAnother">add another</label>
+	</div>
+	{% endif %}
 	<button class="btn btn-primary" id="save">Save</button>
+
 </form>
 
 {% endblock %}
@@ -132,7 +139,12 @@
 			body: JSON.stringify(field)
 		});
 
-		window.location.replace('/collections/view/{{ query.collection_id }}');
+		let addAnother = document.querySelector('input#addAnother');
+		if (addAnother && addAnother.value) {
+			window.location.replace('/fields/form?collection_id={{ query.collection_id }}');
+		} else {
+			window.location.replace('/collections/view/{{ query.collection_id }}');
+		}
 
 	}
 

@@ -124,9 +124,9 @@
 			row += '<td><a href="/items/view/' + item.id + '?collection_id={{ id }}">' + item.name + '</a></td>';
 			for (field of fields) {
 				row += '<td>';
-				if (field.prefix) row += field.prefix + ' ';
+				if (itemData[field.id] && field.prefix) row += field.prefix + ' ';
 				row += itemData[field.id];
-				if (field.suffix) row += ' ' + field.suffix;
+				if (itemData[field.id] && field.suffix) row += ' ' + field.suffix;
 				row += '</td>';
 			}
 			row += '<td>';
@@ -149,7 +149,9 @@
 			if (field.hidden) {
 				document.querySelector('#toggleFieldButtons > #field-' + field.id).classList.add('btn-outline-primary');
 				document.querySelector('#itemsTable th:nth-child(' + columnIndex + ')').setAttribute('style', 'display: none');
-				document.querySelector('#itemsTable td:nth-child(' + columnIndex + ')').setAttribute('style', 'display: none');
+				if (items.length > 0) {
+					document.querySelectorAll('#itemsTable td:nth-child(' + columnIndex + ')').forEach((el) => el.setAttribute('style', 'display: none'));
+				}
 			} else {
 				document.querySelector('#toggleFieldButtons > #field-' + field.id).classList.add('btn-primary');
 			}
@@ -163,11 +165,11 @@
 				if (this.classList.contains('btn-primary')) {
 					this.classList.replace('btn-primary', 'btn-outline-primary');
 					document.querySelector('#itemsTable th:nth-child(' + columnIndex + ')').setAttribute('style', 'display: none');
-					document.querySelector('#itemsTable td:nth-child(' + columnIndex + ')').setAttribute('style', 'display: none');
+					document.querySelectorAll('#itemsTable td:nth-child(' + columnIndex + ')').forEach((el) => el.setAttribute('style', 'display: none'));
 				} else {
 					this.classList.replace('btn-outline-primary', 'btn-primary');
 					document.querySelector('#itemsTable th:nth-child(' + columnIndex + ')').removeAttribute('style');
-					document.querySelector('#itemsTable td:nth-child(' + columnIndex + ')').removeAttribute('style');
+					document.querySelectorAll('#itemsTable td:nth-child(' + columnIndex + ')').forEach((el) => el.removeAttribute('style'));
 				}
 			})
 		});
