@@ -25,37 +25,53 @@
 	<dd class="col-sm-10 collectionDescription"></dd>
 </dl>
 
-<div class="btn-group mb-3">
-	<a href="/items/form?collection_id={{ id }}" class="btn btn-primary">add new item</a>
+<ul class="nav nav-tabs mb-3">
+	<li class="nav-item">
+		<a href="#items" class="nav-link active" data-toggle="tab">Items</a>
+	</li>
+	<li class="nav-item">
+		<a href="#fields" class="nav-link" data-toggle="tab">Fields</a>
+	</li>
+</ul>
+
+<div class="tab-content">
+
+	<div class="tab-pane show active" id="items">
+		<div class="btn-group mb-3">
+			<a href="/items/form?collection_id={{ id }}" class="btn btn-primary">add new item</a>
+		</div>
+		<table class="table table-sm" id="itemsTable">
+			<thead>
+				<tr>
+					<th>name</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<div class="tab-pane" id="fields">
+		<div class="btn-group mb-3">
+			<a href="/fields/reorder?collection_id={{ id }}" class="btn btn-info">reorder</a>
+			<a href="/fields/form?collection_id={{ id }}" class="btn btn-primary">add new field</a>
+		</div>
+
+		<table class="table table-sm" id="fieldsTable">
+			<thead>
+				<tr>
+					<th>order</th>
+					<th>name</th>
+					<th>hidden</th>
+					<th>shown</th>
+					<th>description</th>
+					<th>action</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
 </div>
-
-<table class="table table-sm" id="itemsTable">
-	<thead>
-		<tr>
-			<th>name</th>
-		</tr>
-	</thead>
-	<tbody></tbody>
-</table>
-
-<div class="btn-group mb-3">
-	<a href="/fields/reorder?collection_id={{ id }}" class="btn btn-info">reorder</a>
-	<a href="/fields/form?collection_id={{ id }}" class="btn btn-primary">add new field</a>
-</div>
-
-<table class="table table-sm" id="fieldsTable">
-	<thead>
-		<tr>
-			<th>order</th>
-			<th>name</th>
-			<th>hidden</th>
-			<th>shown</th>
-			<th>description</th>
-			<th>action</th>
-		</tr>
-	</thead>
-	<tbody></tbody>
-</table>
 
 {% endblock %}
 
@@ -100,7 +116,7 @@
 			let row = '<tr>';
 			row += '<td><a href="/items/view/'+item.id+'?collection_id={{ id }}">' + item.name + '</a></td>';
 			for (field of fields) {
-				row += '<td>' + itemData[field.name] + '</td>';
+				row += '<td>' + itemData[field.id] + '</td>';
 			}
 			row += '<td>';
 			row += '<div class="btn-group">';

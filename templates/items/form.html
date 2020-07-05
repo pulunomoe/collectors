@@ -100,7 +100,7 @@
 
 		let itemData = {};
 		for (field of fields) {
-			itemData[field.name] = document.querySelector('input#field-' + field.id).value;
+			itemData[field.id] = document.querySelector('input#field-' + field.id).value;
 		}
 		item.data = JSON.stringify(itemData);
 

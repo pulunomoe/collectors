@@ -1,7 +1,6 @@
 <?php
 
 $dbFile = getenv('COLLECTORS_ENV') == 'DEV' ? 'collectors_test.db' : 'collectors.db';
-
 $db = new SQLite3($dbFile);
 
 $sql = 'CREATE TABLE IF NOT EXISTS collections (';

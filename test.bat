@@ -1,4 +1,6 @@
 cls
 set COLLECTORS_ENV=DEV
-php initDB.php
-vendor\bin\phpunit tests
+del collectors_test.db
+cmd /C php initDB.php
+cmd /C vendor\bin\phpunit tests
+cmd /C php seedDB.php

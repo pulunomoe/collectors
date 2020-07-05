@@ -87,7 +87,7 @@ class APITestCase extends TestCase
 
 		$itemData = [];
 		foreach ($fields as $field) {
-			$itemData[$field['name']] = self::$faker->word;
+			$itemData[$field['id']] = self::$faker->word;
 		}
 		$item['data'] = json_encode($itemData);
 

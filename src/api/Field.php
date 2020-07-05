@@ -47,6 +47,26 @@ class Field extends APIController
 		]);
 		$id = $this->db->lastInsertRowID();
 
+		// Add the new field to all existing items
+
+		$stmt = $this->db->prepare('UPDATE items SET data = :data WHERE id = :id');
+
+		$result = $this->query('SELECT * FROM items WHERE collection_id = :collection_id', [
+			'collection_id' => $field['collection_id']
+		]);
+
+		while ($item = $result->fetchArray(SQLITE3_ASSOC)) {
+
+			$itemData = json_decode($item['data'], true);
+			$itemData[$id] = '';
+			$item['data'] = json_encode($itemData);
+
+			$stmt->bindValue(':id', $item['id']);
+			$stmt->bindValue(':data', $item['data']);
+			$stmt->execute();
+
+		}
+
 		return $response->withJson(['id' => $id]);
 	}
 
@@ -84,6 +104,26 @@ class Field extends APIController
 		$this->query('DELETE FROM fields WHERE id = :id', [
 			'id' => $field['id']
 		]);
+
+		// Remove the field from all existing items
+
+		$stmt = $this->db->prepare('UPDATE items SET data = :data WHERE id = :id');
+
+		$result = $this->query('SELECT * FROM items WHERE collection_id = :collection_id', [
+			'collection_id' => $field['collection_id']
+		]);
+
+		while ($item = $result->fetchArray(SQLITE3_ASSOC)) {
+
+			$itemData = json_decode($item['data'], true);
+			unset($itemData[$field['id']]);
+			$item['data'] = json_encode($itemData);
+
+			$stmt->bindValue(':id', $item['id']);
+			$stmt->bindValue(':data', $item['data']);
+			$stmt->execute();
+
+		}
 
 		return $response->withStatus(200);
 	}
