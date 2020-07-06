@@ -71,7 +71,19 @@
 			let formGroup = '<div class="col-4">';
 			formGroup += '<div class="form-group">';
 			formGroup += '<label for="' + field.name + '">' + field.name + '</label>';
+			formGroup += '<div class="input-group">';
+			if (field.prefix) {
+				formGroup += '<div class="input-group-prepend">';
+				formGroup += '<span class="input-group-text">' + field.prefix + '</span>';
+				formGroup += '</div>';
+			}
 			formGroup += '<input type="text" class="form-control" id="field-' + field.id + '" />';
+			if (field.suffix) {
+				formGroup += '<div class="input-group-append">';
+				formGroup += '<span class="input-group-text">' + field.suffix + '</span>';
+				formGroup += '</div>';
+			}
+			formGroup += '</div>';
 			formGroup += '</div>';
 			formGroup += '</div>';
 			document.querySelector('#itemForm > .row').innerHTML += formGroup;

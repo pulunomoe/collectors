@@ -38,18 +38,18 @@
 
 	<div class="tab-pane show active" id="items">
 		<div class="btn-group mb-3">
+			<a href="#" class="btn btn-info" id="exportButton">export to csv</a>
 			<a href="/items/form?collection_id={{ id }}" class="btn btn-primary">add new item</a>
 		</div>
 		<p><strong>show/hide fields:</strong></p>
-		<div class="mb-3" id="toggleFieldButtons">
-		</div>
+		<div class="mb-3" id="toggleFieldButtons"></div>
 		<table class="table table-sm" id="itemsTable">
 			<thead>
-				<tr>
-					<th>name</th>
+				<tr style="cursor: pointer">
+					<th class="sort" data-sort="field-name">name</th>
 				</tr>
 			</thead>
-			<tbody></tbody>
+			<tbody class="list"></tbody>
 		</table>
 	</div>
 
@@ -80,14 +80,19 @@
 {% endblock %}
 
 {% block script %}
+<script src="/js/list.min.js"></script>
 <script>
 
 	(async () => {
+
+		// Collection
 
 		let response = await fetch('/api/collections/{{ id }}');
 		let collection = await response.json();
 		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
 		document.querySelectorAll('.collectionDescription').forEach((el) => el.innerHTML = collection.description);
+
+		// Fields
 
 		response = await fetch('/api/fields?collection_id={{ id }}');
 		let fields = await response.json();
@@ -111,19 +116,21 @@
 			row += '</tr>';
 			document.querySelector('#fieldsTable > tbody').innerHTML += row;
 
-			let itemHeader = '<th>' + field.name + '</th>';
+			let itemHeader = '<th class="sort" data-sort="field-' + field.id + '">' + field.name + '</th>';
 			document.querySelector('#itemsTable > thead > tr').innerHTML += itemHeader;
 
 		}
+
+		// Items
 
 		response = await fetch('/api/items?collection_id={{ id }}');
 		let items = await response.json();
 		for (item of items) {
 			let itemData = JSON.parse(item.data);
 			let row = '<tr>';
-			row += '<td><a href="/items/view/' + item.id + '?collection_id={{ id }}">' + item.name + '</a></td>';
+			row += '<td class="field-name"><a href="/items/view/' + item.id + '?collection_id={{ id }}">' + item.name + '</a></td>';
 			for (field of fields) {
-				row += '<td>';
+				row += '<td class="field-' + field.id + '">';
 				if (itemData[field.id] && field.prefix) row += field.prefix + ' ';
 				row += itemData[field.id];
 				if (itemData[field.id] && field.suffix) row += ' ' + field.suffix;
@@ -140,6 +147,8 @@
 		}
 
 		document.querySelector('#itemsTable > thead > tr').innerHTML += '<th>action</th>';
+
+		// Toggle field buttons
 
 		for (field of fields) {
 
@@ -174,7 +183,42 @@
 			})
 		});
 
+		// List.js
+
+		let valueNames = ['field-name'];
+		for (field of fields) {
+			valueNames.push('field-' + field.id);
+		}
+
+		new List('itemsTable', {
+			valueNames: valueNames
+		});
+
 	})();
+
+	document.querySelector('#exportButton').onclick = function (e) {
+
+		let csv = [];
+		document.querySelectorAll('#itemsTable tr').forEach(function (row, rowIndex) {
+			let line = [];
+			let cols = row.querySelectorAll('td, th');
+			for (let i = 0; i < cols.length - 1; i++) {
+				let data = cols[i].innerHTML;;
+				if (i == 0 && rowIndex > 0) {
+					data = cols[i].firstChild.innerHTML;
+				}
+				data = data.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ').replace(/"/g, '""');
+				line.push('"' + data + '"');
+			}
+			csv.push(line.join(','));
+		});
+		let csvString = csv.join('\n');
+
+		this.setAttribute('target', '_blank');
+		this.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString));
+		this.setAttribute('download', 'export.csv');
+
+	}
 
 </script>
 {% endblock %}
