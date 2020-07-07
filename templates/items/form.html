@@ -10,7 +10,7 @@
 	<a href="#">item: <span class="itemName"></span></a>
 </li>
 <li class="breadcrumb-item">
-	<a href="/items/form/{{ id }}?collection_id={{ query.collection_id }}">edit</a>
+	<a href="/items/form/{{ id }}?collection_id={{ query.collection_id }}">{{ query.copy ? 'copy' : 'edit' }}</a>
 </li>
 {% else %}
 <li class="breadcrumb-item">
@@ -22,14 +22,18 @@
 
 {% block content %}
 
-<h1 class="mb-3">{{ id ? 'edit' : 'add new' }} item</h1>
+{% if id %}
+<h1 class="mb-3">{{ query.copy ? 'copy' : 'edit' }} item</h1>
+{% else %}
+<h1 class="mb-3">and new item</h1>
+{% endif %}
 
 <div class="btn-group mb-3">
 	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
 </div>
 
 <form id="itemForm">
-	{% if id %}
+	{% if id and not query.copy %}
 	<input type="hidden" id="id" value="{{ id }}" />
 	{% endif %}
 	<input type="hidden" id="collection_id" value="{{ query.collection_id }}" />
@@ -102,6 +106,8 @@
 			document.querySelector('input#field-' + field.id).value = itemData[field.id].trim();
 		}
 
+		{% if not query.copy %}
+
 		response = await fetch('/upload/item_{{ id }}.jpg');
 		if (response.ok) {
 			let imgPreview = document.querySelector('img#preview');
@@ -110,6 +116,8 @@
 			imgPreview.setAttribute('class', 'img-thumbnail w-25 mb-3');
 			imgPreview.removeAttribute('style');
 		}
+
+		{% endif %}
 
 		{% endif %}
 
@@ -149,7 +157,7 @@
 
 		let method = 'POST';
 
-		{% if id %}
+		{% if id and not query.copy %}
 
 		item.id = document.querySelector('input#id').value
 		method = 'PUT';

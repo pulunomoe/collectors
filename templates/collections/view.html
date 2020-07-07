@@ -38,8 +38,8 @@
 
 	<div class="tab-pane show active" id="items">
 		<div class="btn-group mb-3">
-			<a href="#" class="btn btn-info" id="exportButton">export to csv</a>
 			<a href="/items/form?collection_id={{ id }}" class="btn btn-primary">add new item</a>
+			<a href="#" class="btn btn-info" id="exportButton">export to csv</a>
 		</div>
 		<p><strong>show/hide fields:</strong></p>
 		<div class="mb-3" id="toggleFieldButtons"></div>
@@ -138,6 +138,7 @@
 			}
 			row += '<td>';
 			row += '<div class="btn-group">';
+			row += '<a href="/items/form/' + item.id + '?collection_id={{ id }}&copy=1" class="btn btn-sm btn-success">Copy</a>';
 			row += '<a href="/items/form/' + item.id + '?collection_id={{ id }}" class="btn btn-sm btn-info">Edit</a>';
 			row += '<a href="/items/delete/' + item.id + '?collection_id={{ id }}" class="btn btn-sm btn-danger">Delete</a>';
 			row += '</div>';
