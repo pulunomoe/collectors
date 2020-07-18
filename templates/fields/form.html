@@ -140,7 +140,7 @@
 		});
 
 		let addAnother = document.querySelector('input#addAnother');
-		if (addAnother && addAnother.value) {
+		if (addAnother && addAnother.checked) {
 			window.location.replace('/fields/form?collection_id={{ query.collection_id }}');
 		} else {
 			window.location.replace('/collections/view/{{ query.collection_id }}');
