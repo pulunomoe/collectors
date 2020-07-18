@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ query.collection_id  }}" class="collectionName"></a>
+</li>
+{% if id %}
+<li class="breadcrumb-item">
+	<a href="#">item: <span class="itemName"></span></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="/items/form/{{ id }}?collection_id={{ query.collection_id }}">{{ query.copy ? 'copy' : 'edit' }}</a>
+</li>
+{% else %}
+<li class="breadcrumb-item">
+	<a href="/items/form">add new item</a>
+</li>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+{% if id %}
+<h1 class="mb-3">{{ query.copy ? 'copy' : 'edit' }} item</h1>
+{% else %}
+<h1 class="mb-3">and new item</h1>
+{% endif %}
+
+<div class="btn-group mb-3">
+	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
+</div>
+
+<form id="itemForm">
+	{% if id and not query.copy %}
+	<input type="hidden" id="id" value="{{ id }}" />
+	{% endif %}
+	<input type="hidden" id="collection_id" value="{{ query.collection_id }}" />
+	<div class="form-group">
+		<label for="name">name</label>
+		<input type="text" class="form-control" id="name" />
+	</div>
+	<div class="row">
+	</div>
+	<div class="form-group">
+		<label for="description">description</label>
+		<textarea class="form-control" id="description"></textarea>
+	</div>
+	<input type="hidden" id="image-data" value="{{ query.collection_id }}" />
+	<img id="preview" style="display: none" />
+	<div class="form-group">
+		<label for="image">image</label>
+		<input type="file" accept="image/*" class="form-control-file" id="image" />
+	</div>
+	<button class="btn btn-primary" id="save">Save</button>
+</form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	let fields = [];
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ query.collection_id }}');
+		let collection = await response.json();
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		response = await fetch('/api/fields?collection_id={{ query.collection_id }}');
+		fields = await response.json();
+		for (field of fields) {
+			let formGroup = '<div class="col-4">';
+			formGroup += '<div class="form-group">';
+			formGroup += '<label for="' + field.name + '">' + field.name + '</label>';
+			formGroup += '<div class="input-group">';
+			if (field.prefix) {
+				formGroup += '<div class="input-group-prepend">';
+				formGroup += '<span class="input-group-text">' + field.prefix + '</span>';
+				formGroup += '</div>';
+			}
+			formGroup += '<input type="text" class="form-control" id="field-' + field.id + '" />';
+			if (field.suffix) {
+				formGroup += '<div class="input-group-append">';
+				formGroup += '<span class="input-group-text">' + field.suffix + '</span>';
+				formGroup += '</div>';
+			}
+			formGroup += '</div>';
+			formGroup += '</div>';
+			formGroup += '</div>';
+			document.querySelector('#itemForm > .row').innerHTML += formGroup;
+		}
+
+		{% if id %}
+
+		response = await fetch('/api/items/{{ id }}');
+		let item = await response.json();
+		document.querySelectorAll('.itemName').forEach((el) => el.innerHTML = item.name);
+		document.querySelector('input#name').value = item.name;
+		document.querySelector('textarea#description').innerHTML = item.description;
+
+		let itemData = JSON.parse(item.data);
+		for (field of fields) {
+			document.querySelector('input#field-' + field.id).value = itemData[field.id].trim();
+		}
+
+		{% if not query.copy %}
+
+		response = await fetch('/upload/item_{{ id }}.jpg');
+		if (response.ok) {
+			let imgPreview = document.querySelector('img#preview');
+			imgPreview.setAttribute('src', '/upload/item_{{ id }}.jpg');
+			imgPreview.setAttribute('height', 300);
+			imgPreview.setAttribute('class', 'img-thumbnail w-25 mb-3');
+			imgPreview.removeAttribute('style');
+		}
+
+		{% endif %}
+
+		{% endif %}
+
+	})();
+
+	document.querySelector('input#image').onchange = function () {
+		if (this.files && this.files[0]) {
+			let reader = new FileReader();
+			reader.onload = function (e) {
+				let imgPreview = document.querySelector('img#preview');
+				imgPreview.setAttribute('src', e.target.result);
+				imgPreview.setAttribute('height', 300);
+				imgPreview.setAttribute('class', 'img-thumbnail w-25 mb-3');
+				imgPreview.removeAttribute('style');
+				document.querySelector('input#image-data').value = e.target.result;
+			}
+			reader.readAsDataURL(this.files[0]);
+		}
+	}
+
+	document.querySelector('button#save').onclick = async function (e) {
+
+		e.preventDefault();
+
+		let item = {
+			'collection_id': document.querySelector('input#collection_id').value,
+			'name': document.querySelector('input#name').value,
+			'description': document.querySelector('textarea#description').value,
+			'image': document.querySelector('input#image-data').value
+		};
+
+		let itemData = {};
+		for (field of fields) {
+			itemData[field.id] = document.querySelector('input#field-' + field.id).value;
+		}
+		item.data = JSON.stringify(itemData);
+
+		let method = 'POST';
+
+		{% if id and not query.copy %}
+
+		item.id = document.querySelector('input#id').value
+		method = 'PUT';
+
+		{% endif %}
+
+		let response = await fetch('/api/items', {
+			method: method,
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify(item)
+		});
+
+		window.location.replace('/collections/view/{{ query.collection_id }}');
+
+	}
+
+</script>
+{% endblock %}

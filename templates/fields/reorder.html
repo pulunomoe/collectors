@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ query.collection_id  }}" class="collectionName"></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="/fields/reorder?collection_id={{ query.collection_id }}">reorder fields</a>
+</li>
+
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-3"><span class="collectionName"></span> - reorder fields</h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
+</div>
+
+<ul class="list-group mb-3" id="fieldsList"></ul>
+<button class="btn btn-primary" id="save">Save</button>
+
+{% endblock %}
+
+{% block script %}
+
+<script src="/js/sortable.min.js"></script>
+
+<script>
+
+	let sortable;
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ query.collection_id }}');
+		let collection = await response.json();
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		response = await fetch('/api/fields?collection_id={{ query.collection_id }}');
+		let fields = await response.json();
+		for (field of fields) {
+			list = '<li class="list-group-item" data-id="' + field.id + '">' + field.name + '</li>';
+			document.querySelector('#fieldsList').innerHTML += list;
+		}
+
+		sortable = Sortable.create(document.querySelector('#fieldsList'));
+
+	})();
+
+	document.querySelector('button#save').onclick = async function (e) {
+
+		let orders = sortable.toArray();
+
+		for (let i = 1; i <= orders.length; i++) {
+			await fetch('/api/fields/order', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json;charset=utf-8'
+				},
+				body: JSON.stringify({
+					'id': orders[i-1],
+					'order': i,
+				})
+			});
+
+		}
+
+		window.location.replace('/collections/view/{{ query.collection_id }}');
+
+	}
+
+</script>
+{% endblock %}

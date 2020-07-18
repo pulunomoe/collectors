@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ query.collection_id  }}" class="collectionName"></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="#"><span class="itemName"></span></a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-3 itemName"></h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
+	<a href="/items/form/{{ id }}?collection_id={{ query.collection_id }}" class="btn btn-info">edit</a>
+	<a href="/items/delete/{{ id }}?collection_id={{ query.collection_id }}" class="btn btn-danger">delete</a>
+</div>
+
+<div class="row">
+	<div class="col">
+		<dl class="row"></dl>
+	</div>
+	<div class="col">
+		<img src="/upload/item_{{ id }}.jpg" class="img-fluid">
+	</div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ query.collection_id }}');
+		let collection = await response.json();
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		response = await fetch('/api/items/{{ id }}');
+		let item = await response.json();
+		let itemData = JSON.parse(item.data);
+		document.querySelectorAll('.itemName').forEach((el) => el.innerHTML = item.name);
+
+		response = await fetch('/api/fields?collection_id={{ query.collection_id }}');
+		fields = await response.json();
+		for (field of fields) {
+			let definition = '<dt class="col-sm-3">' + field.name + '</dt>';
+			definition += '<dd class="col-sm-9">' + field.prefix + ' ' + itemData[field.id] + ' ' + field.suffix + '</dd>';
+			document.querySelector('dl').innerHTML += definition;
+		}
+
+		let description = '<dt class="col-sm-3">description</dt>';
+		description += '<dd class="col-sm-9">' + item.description + '</dd>';
+		document.querySelector('dl').innerHTML += description;
+
+	})();
+
+</script>
+{% endblock %}

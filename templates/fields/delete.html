@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ query.collection_id  }}" class="collectionName"></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="#">field: <span class="fieldName"></span></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="/fields/delete/{{ id }}?collection_id={{ query.collection_id }}">delete</a>
+</li>
+
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-3"><span class="collectionName"></span> - field: <span class="fieldName"></span></h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
+</div>
+
+<div class="alert alert-danger">
+	<p class="lead">are you sure you want to delete this field? all the items value inside this field will be deleted too!</p>
+	<button class="btn btn-danger" id="delete">yes, please delete</button>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ query.collection_id }}');
+		let collection = await response.json();
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		response = await fetch('/api/fields/{{ id }}');
+		let field = await response.json();
+		document.querySelectorAll('.fieldName').forEach((el) => el.innerHTML = field.name);
+
+	})();
+
+	document.querySelector('button#delete').onclick = async function (e) {
+
+		if (confirm('really, really sure?')) {
+
+			await fetch('/api/fields', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json;charset=utf-8'
+				},
+				body: JSON.stringify({
+					'id': '{{ id }}'
+				})
+			});
+
+			window.location.replace('/collections/view/{{ query.collection_id }}');
+
+		}
+
+	}
+
+</script>
+{% endblock %}

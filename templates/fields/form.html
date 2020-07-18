@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+
+<li class="breadcrumb-item">
+	<a href="/collections/view/{{ query.collection_id  }}" class="collectionName"></a>
+</li>
+{% if id %}
+<li class="breadcrumb-item">
+	<a href="#">field: <span class="fieldName"></span></a>
+</li>
+<li class="breadcrumb-item">
+	<a href="/fields/form/{{ id }}?collection_id={{ query.collection_id }}">edit</a>
+</li>
+{% else %}
+<li class="breadcrumb-item">
+	<a href="/fields/form">add new field</a>
+</li>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-3">{{ id ? 'edit' : 'add new' }} field</h1>
+
+<div class="btn-group mb-3">
+	<a href="/collections/view/{{ query.collection_id }}" class="btn btn-outline-primary">back to collection</a>
+</div>
+
+<form id="fieldForm">
+	{% if id %}
+	<input type="hidden" id="id" value="{{ id }}" />
+	{% endif %}
+	<input type="hidden" id="collection_id" value="{{ query.collection_id }}" />
+	<div class="row">
+		<div class="col-4">
+			<div class="form-group">
+				<label for="name">name</label>
+				<input type="text" class="form-control" id="name" />
+			</div>
+		</div>
+		<div class="col-2">
+			<div class="form-group">
+				<label for="prefix">prefix</label>
+				<input type="text" class="form-control" id="prefix" />
+			</div>
+		</div>
+		<div class="col-2">
+			<div class="form-group">
+				<label for="prefix">suffix</label>
+				<input type="text" class="form-control" id="suffix" />
+			</div>
+		</div>
+		<div class="col-2">
+			<label for="hidden">hidden</label>
+			<select class="form-control" name="hidden" id="hidden">
+				<option value="0">no</option>
+				<option value="1">yes</option>
+			</select>
+		</div>
+		<div class="col-2">
+			<label for="shown">shown</label>
+			<select class="form-control" name="shown" id="shown">
+				<option value="0">no</option>
+				<option value="1">yes</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="description">description</label>
+		<textarea class="form-control" id="description"></textarea>
+	</div>
+	{% if not id %}
+	<div class="form-group">
+		<input type="checkbox" value="1" id="addAnother" checked="checked">
+		<label for="addAnother">add another</label>
+	</div>
+	{% endif %}
+	<button class="btn btn-primary" id="save">Save</button>
+
+</form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+	(async () => {
+
+		let response = await fetch('/api/collections/{{ query.collection_id }}');
+		let collection = await response.json();
+		document.querySelectorAll('.collectionName').forEach((el) => el.innerHTML = collection.name);
+
+		{% if id %}
+
+		response = await fetch('/api/fields/{{ id }}');
+		let field = await response.json();
+		document.querySelectorAll('.fieldName').forEach((el) => el.innerHTML = field.name);
+		document.querySelector('input#name').value = field.name;
+		document.querySelector('input#prefix').value = field.prefix;
+		document.querySelector('input#suffix').value = field.suffix;
+		document.querySelector('textarea#description').innerHTML = field.description;
+		document.querySelector('select#hidden').value = field.hidden;
+		document.querySelector('select#shown').value = field.shown;
+
+		{% endif %}
+
+	})();
+
+	document.querySelector('button#save').onclick = async function (e) {
+
+		e.preventDefault();
+
+		let field = {
+			'collection_id': document.querySelector('input#collection_id').value,
+			'name': document.querySelector('input#name').value,
+			'prefix': document.querySelector('input#prefix').value,
+			'suffix': document.querySelector('input#suffix').value,
+			'hidden': document.querySelector('select#hidden').value,
+			'shown': document.querySelector('select#shown').value,
+			'description': document.querySelector('textarea#description').value
+		}
+
+		let method = 'POST';
+
+		{% if id %}
+
+		field.id = document.querySelector('input#id').value;
+		method = 'PUT';
+
+		{% endif %}
+
+		let response = await fetch('/api/fields', {
+			method: method,
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify(field)
+		});
+
+		let addAnother = document.querySelector('input#addAnother');
+		if (addAnother && addAnother.checked) {
+			window.location.replace('/fields/form?collection_id={{ query.collection_id }}');
+		} else {
+			window.location.replace('/collections/view/{{ query.collection_id }}');
+		}
+
+	}
+
+</script>
+{% endblock %}
