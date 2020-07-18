@@ -61,3 +61,7 @@ Because.
 ## License
 
 This software is MIT licensed. See the LICENSE file for more info.
+
+## Like this software?
+
+[Buy me some coffee](https://ko-fi.com/pulunomoe) or [buy me some cendol](https://trakteer.id/pulunomoe)
